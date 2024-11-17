@@ -15,4 +15,4 @@ pip install streamlit
 First run the flask app then the spring boot app. The available spring apis can be
 explored using swagger: after running the spring server, go to your browser and
 type http://localhost:8082/swagger-ui/index.html
-Make sure to check the spring application.properties file (in resources folder under src/main) and to change the test folder directory to match the one where you're keeping the test pictures.
+Make sure to check the spring application.properties file (in resources folder under src/main) and to change that absolute path you'll see there to match the one where you're keeping the test pictures. For those test pictures, create a folder and name it 'static', this is a shared folder between both servers, and it should be placed besides them just like this readme file (sorry for those complications but this stuff is going to change anyway so, never mind).
