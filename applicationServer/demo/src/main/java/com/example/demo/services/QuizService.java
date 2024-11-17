@@ -7,6 +7,9 @@ import com.example.demo.repositories.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 public class QuizService {
     private final ClassRepository classRepository;
@@ -23,6 +26,12 @@ public class QuizService {
     }
 
     public Iterable<QuizModel> getAll(){
+
         return quizRepository.findAll();
+    }
+    public Map<String, String> getAllClassesAsMap(){
+
+        return classRepository.findAll().stream()
+                .collect(Collectors.toMap(ClassModel::getId, ClassModel::getLabel));
     }
 }
