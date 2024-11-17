@@ -2,3 +2,6 @@
 /train
 /validation
 /more-test
+/docs
+/static
+.venv/

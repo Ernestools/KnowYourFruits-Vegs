@@ -1,0 +1,48 @@
+First steps with flask: a beginner friendly guide
+written by a beginner(nay) for a friendly little cutie(rimo)  
+
+the official documentation said to run these commands:
+
+mkdir myproject
+cd myproject
+py -3 -m venv .venv
+
+.venv\Scripts\activate
+
+pip install Flask
+
+now in the same directory, create whatever scritps that you want
+and run your main script using this command:
+
+flask --app myMainScriptName run --debug
+
+for connecting to a mysql db we need to install a mysql connector: 
+https://mariadb.com/downloads/connectors/
+
+then we need to install a mysqlclient package by running this command:
+pip install mysqlclient
+
+then the Flask-MySQLdb dependency with the following command 
+(we should run this in the ternminal were we have activated the environment):
+pip install Flask-MySQLdb
+
+NOTES:
+2 - always remember to run MYSQL server (wamp, xamp whatever you've installed).
+2.5 - we're directly interacting with the connector, which I do not like,
+it is the simple and the old school way of doing it tho but it has got
+some dangerous pitfalls on the long term, which we'll discuss inchallah.
+I've chosen this way in order to minimise the research, when everything
+runs the way we want, we can look for an ORM and make it a more 
+elegant dev experience.
+3 - this server can be something that's so good, we can for instance
+save the training metadata and show it in whatever way we want to.
+The server can be used as well to achieve the automation of the
+training process, which is still an abstract idea, nevertheless 
+both of us love imagining things. Albert Einstein once said 
+"Imagination is more important than knowledge".
+4 - sorry if I wrote too much.
+1 - we'll become some kick ass IT experts inchallah, transform it
+to some side hustle, then you'll teach me Turkish and I'll teach you art, 
+may Allah be with us.
+
+Have a good reading <3.

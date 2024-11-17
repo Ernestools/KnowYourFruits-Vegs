@@ -5,6 +5,7 @@ import numpy as np
 
 #Tensorflow Model Prediction
 def model_prediction(test_image):
+    print(test_image)
     model = tf.keras.models.load_model("trained_model.h5")
     image = tf.keras.preprocessing.image.load_img(test_image,target_size=(64,64))
     input_arr = tf.keras.preprocessing.image.img_to_array(image)
@@ -18,7 +19,7 @@ app_mode = st.sidebar.selectbox("Select Page",["Home","Prediction"])
 
 #Main Page
 if(app_mode=="Home"):
-    st.header("FRUITS & VEGETABLES RECOGNITION SYSTEM")
+    st.header("CURIOUS KIDS")
     
 
 #Prediction Page
