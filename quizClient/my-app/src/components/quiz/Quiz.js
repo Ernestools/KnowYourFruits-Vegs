@@ -10,13 +10,18 @@ const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [currentChoices, setCurrentChoices] = useState([]);
-
+    const [showAlert, setShowAlert] = useState(false);
+    
+    const shuffleArray = (array) => {
+        return array.sort(() => Math.random() - 0.5);
+    };
+    
     useEffect(() => {
         const initializeQuiz = async () => {
             const quizService = await QuizService.getInstance();
             var fetchedQuestions = await quizService.getAllQuestions();
             const fetchedAnswers = await quizService.getAllChoices();
-            fetchedQuestions = fetchedQuestions.slice(0,5);
+            fetchedQuestions = shuffleArray(fetchedQuestions);
             setQuestions(fetchedQuestions);
             setAnswers(fetchedAnswers);
 
@@ -30,9 +35,9 @@ const Quiz = () => {
         initializeQuiz();
     }, []);
 
-    const shuffleArray = (array) => {
-        return array.sort(() => Math.random() - 0.5);
-    };
+    const endQuiz = () => {
+        setShowAlert(true);
+    }
 
     const nextQuestion = async () => {
         if (selectedAnswer !== null) {
@@ -54,7 +59,7 @@ const Quiz = () => {
                 setCurrentChoices(shuffleArray(userChoices));
                 setCurrentQuestionIndex(nextIndex);
             } else {
-                alert(`Quiz complete! Your score: ${score + 1}/${questions.length}`);
+                setShowAlert(true);
             }
         } else {
             alert("Please select an answer before proceeding.");
@@ -78,6 +83,16 @@ const Quiz = () => {
                 selectedAnswer={selectedAnswer}
             />
             <button onClick={nextQuestion}>Next Question</button>
+            <button onClick={endQuiz}>End Quiz</button>
+            {showAlert && (
+                <div className="custom-alert">
+                    <div className="alert-content">
+                        <h2>Quiz Complete!</h2>
+                        <p>Your score: {score}/{currentQuestionIndex}</p>
+                        <button onClick={() => window.location.reload()}>Restart Quiz</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

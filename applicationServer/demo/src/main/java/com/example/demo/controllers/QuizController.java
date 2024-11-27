@@ -1,15 +1,10 @@
 package com.example.demo.controllers;
 
 import com.example.demo.services.QuizService;
-import com.example.demo.models.ClassModel;
 import com.example.demo.models.QuizModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @CrossOrigin
@@ -31,6 +26,11 @@ public class QuizController {
     @GetMapping(path = "choices")
     public Map<String, String> getAllChoices() {
         return quizService.getAllClassesAsMap();
+    }
+
+    @PostMapping(path = "score")
+    public void saveScore(@RequestBody Game score){
+        //traitement
     }
 
 }
