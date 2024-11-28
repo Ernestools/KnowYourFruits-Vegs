@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { properties } from '../../properties';
+import axios from "axios";
 
 const CameraAccess = () => {
   const videoRef = useRef(null);
@@ -24,7 +25,7 @@ const CameraAccess = () => {
 
     const interval = setInterval(() => {
         processFrame();
-    }, 1000);
+    }, 10000);
 
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -46,8 +47,8 @@ const CameraAccess = () => {
     const originalHeight = video.videoHeight;
 
     // Set desired size for resizing
-    const width = originalWidth ; // Desired width
-    const height = originalHeight ; // Desired height
+    const width = originalWidth * 0.25; // Desired width
+    const height = originalHeight * 0.25; // Desired height
     canvas.width = width;
     canvas.height = height;
 
@@ -62,11 +63,11 @@ const CameraAccess = () => {
         if (blob) {
           // Prepare form data to send
           const formData = new FormData();
-          formData.append("frame", blob, "frame.png");
+          formData.append("frame", blob, "frame");
 
           try {
             // Send the blob as a file via Axios
-            const response = await axios.post(properties.DataServerBasePath, formData, {
+            const response = await axios.post(properties.DataServerBasePath+'/'+properties.RecognitionApi, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
@@ -78,15 +79,16 @@ const CameraAccess = () => {
         }
       }, "image/png");
     }
+
+    return (
+      <div>
+        <video ref={videoRef} autoPlay style={{ display: "none" }} />
+        <canvas ref={canvasRef} style={{ border: "1px solid black" }} />
+        <button onClick={processFrame}>Process Frame</button>
+      </div>
+    );
   };
 
-  return (
-    <div>
-      <video ref={videoRef} autoPlay style={{ display: "none" }} />
-      <canvas ref={canvasRef} style={{ border: "1px solid black" }} />
-      <button onClick={processFrame}>Process Frame</button>
-    </div>
-  );
 
 
 export default CameraAccess;

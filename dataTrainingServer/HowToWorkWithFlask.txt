@@ -14,7 +14,7 @@ pip install Flask
 now in the same directory, create whatever scritps that you want
 and run your main script using this command:
 
-flask --app myMainScriptName run --debug
+flask --app main run --debug
 
 for connecting to a mysql db we need to install a mysql connector: 
 https://mariadb.com/downloads/connectors/
