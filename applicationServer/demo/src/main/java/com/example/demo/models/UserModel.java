@@ -11,19 +11,22 @@ public class UserModel {
     private String id;
     @Column(name = "username")
     private String username;
-
-    public UserModel(String id, String username) {
-        this.id = id;
-        this.username = username;
-    }
-
-    public UserModel(String username) {
-        this.username = username;
-    }
+    private String url ;
 
     public UserModel() {
     }
 
+    public UserModel(String username, String url) {
+        this.username = username;
+        this.url = url;
+
+    }
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
     public String getId() {
         return id;
     }

@@ -9,7 +9,7 @@ import face_recognition
 import os
 import numpy as np
 from flask_cors import CORS, cross_origin
-import cv2;
+import cv2
 from PIL import Image
 from io import BytesIO
 
@@ -29,7 +29,8 @@ test_assets_path = "../static/test"
 model_path = "trained_model.h5"
 
 mysql = MySQL(app)
-predictionService = None#PredictionService("trained_model.h5", test_assets_path)
+predictionService = None
+#PredictionService("trained_model.h5", test_assets_path)
 
 @app.route("/")
 def hello_world():
@@ -98,8 +99,6 @@ def upload_file():
         face_locations = face_recognition.face_locations(rgb_array)
         face_encodings = face_recognition.face_encodings(rgb_array, face_locations)
 
-        face_names = []
-
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
@@ -113,6 +112,7 @@ def upload_file():
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
+            print (face_distances)
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 

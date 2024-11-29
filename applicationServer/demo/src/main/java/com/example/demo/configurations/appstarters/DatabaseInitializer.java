@@ -39,7 +39,7 @@ public class DatabaseInitializer {
             if(classRepository.count() > 0)
                 return;
             requestDataServerForInitialization();
-            ensureDefaultUser();
+            //ensureDefaultUser();
         };
     }
 
@@ -57,11 +57,10 @@ public class DatabaseInitializer {
         con.disconnect();
     }
 
-    private void ensureDefaultUser()
-    {
-        if(userRepository.count() > 0)
-            return;
-        UserModel userModel = new UserModel("Kid-A");
-        userRepository.save(userModel);
-    }
+    //private void ensureDefaultUser()
+    //{if(userRepository.count() > 0)
+    //      return;
+    //  UserModel userModel = new UserModel("Kid-A");
+    //  userRepository.save(userModel);
+    //}
 }
