@@ -1,3 +1,4 @@
+import pika, sys, os
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 import json
@@ -11,6 +12,7 @@ import numpy as np
 from flask_cors import CORS, cross_origin
 import cv2;
 from PIL import Image
+import threading
 from io import BytesIO
 
 app = Flask(__name__)
@@ -48,6 +50,26 @@ def initialize_db():
         return ('', 200)
     except Exception as e:
         return (f'Internal Server Error {e}', 500)
+    
+
+
+
+def start_consumer():
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+
+    channel.queue_declare(queue='loanQueue', durable=True)
+
+    def callback(ch, method, properties, body):
+        print(f" [x] Received {body}")
+
+    channel.basic_consume(queue='loanQueue', on_message_callback=callback, auto_ack=True)
+    print(" [*] Waiting for messages. To exit press CTRL+C")
+    channel.start_consuming()
+
+consumer_thread = threading.Thread(target=start_consumer)
+consumer_thread.daemon = True
+consumer_thread.start()
 
 
 naycem_image = face_recognition.load_image_file("naycem.jpg")
