@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class StaticFilesConfig implements WebMvcConfigurer {
+public class StaticFilesConfig implements WebMvcConfigurer {//localhost:8080/static/myimage.png
     @Value("${staticFilesMapping}")
     private String virtualPath;
     @Value("${staticFilesLocation}")
