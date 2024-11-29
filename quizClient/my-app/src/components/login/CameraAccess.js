@@ -89,6 +89,4 @@ const CameraAccess = () => {
     );
   };
 
-
-
 export default CameraAccess;

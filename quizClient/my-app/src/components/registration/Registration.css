@@ -1,0 +1,51 @@
+body {
+    margin: 0; /* Remove default margins */
+    height: 100vh; /* Make the body take the full height of the viewport */
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    background-color: #f9f9f9; /* Optional: light background for better visibility */
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column; /* Stack input and button below video & canvas */
+    align-items: center;
+    gap: 20px; /* Space between the sections */
+  }
+  
+  .media-container {
+    display: flex;
+    gap: 20px; /* Space between video and canvas */
+  }
+  
+  video, canvas {
+    width: 400px; /* Fixed width */
+    height: 300px; /* Fixed height */
+    border: 1px solid #000; /* Optional border for clarity */
+    background-color: #f0f0f0; /* Optional background for canvas */
+  }
+  
+
+  input {
+    width: 300px; /* Fixed width for better visibility */
+    padding: 10px; /* Space inside the input */
+    font-size: 16px; /* Larger text for readability */
+    border: 2px solid #ccc; /* Subtle border */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  }
+  
+  input:focus {
+    border-color: #007BFF; /* Highlight border on focus */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5); /* Add glowing effect */
+    outline: none; /* Remove default outline */
+  }
+  
+  input::placeholder {
+    color: #888; /* Style placeholder text */
+    font-style: italic; /* Italicize placeholder text */
+  }
+  
+  
