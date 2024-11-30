@@ -2,18 +2,14 @@ import pika, sys, os
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 import json
-from DAO.ClassDataAccess import ClassDataAccess
-from DAO.QuizDataAccess import QuizDataAccess
-from Services.PredictionService import PredictionService
-from Services.DbInitService import DbInitService
+from dao import ClassDataAccess, QuizDataAccess, UserDataAccess
+from services import PredictionService, DbInitService
 import face_recognition
 import os
 import numpy as np
-from flask_cors import CORS, cross_origin
-import cv2
+from flask_cors import CORS
 from PIL import Image
 import threading
-from io import BytesIO
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -52,20 +48,49 @@ def initialize_db():
     except Exception as e:
         return (f'Internal Server Error {e}', 500)
     
+known_face_encodings = []
+known_face_names = []
 
+def memorize_user(username, imageUrl):
+    basePath = '..'
+    imagePath = basePath + imageUrl
+    newImage = face_recognition.load_image_file(imagePath)
+    newFaceEncoding = face_recognition.face_encodings(newImage)[0]
+    known_face_encodings.append(newFaceEncoding)
+    known_face_names.append(username)
 
+@app.get("/init/faces")
+def load_users():
+    try:
+        userAccess = UserDataAccess(mysql=mysql)
+        users = userAccess.getAll()
+        print(users)
+        for user in users:
+            memorize_user(user[1], user[2])
+        return ('',200)
+    except Exception as e:
+        return (f'Internal Server Error {e}', 500)
+    
 
 def start_consumer():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
-
-    channel.queue_declare(queue='loanQueue', durable=True)
+    queueName = "userQueue"
+    channel.queue_declare(queue=queueName, durable=True)
 
     def callback(ch, method, properties, body):
-        print(f" [x] Received {body}")
+        basePath = './../..'
+        user = json.loads(body)
+        if user == None:
+            return
+        
+        imagePath = basePath + user['url']
+        username = user['username']
+        memorize_user(username=username, imageUrl= imagePath)
 
-    channel.basic_consume(queue='loanQueue', on_message_callback=callback, auto_ack=True)
-    print(" [*] Waiting for messages. To exit press CTRL+C")
+
+    channel.basic_consume(queue=queueName, on_message_callback=callback, auto_ack=True)
+    print(" [*] Waiting for messages.")
     channel.start_consuming()
 
 consumer_thread = threading.Thread(target=start_consumer)
@@ -73,22 +98,24 @@ consumer_thread.daemon = True
 consumer_thread.start()
 
 
-naycem_image = face_recognition.load_image_file("naycem.jpg")
-naycem_face_encoding = face_recognition.face_encodings(naycem_image)[0]
 
-# Load a second sample picture and learn how to recognize it.
-rima_image = face_recognition.load_image_file("rima.jpg")
-rima_face_encoding = face_recognition.face_encodings(rima_image)[0]
 
-known_face_encodings = [
-    naycem_face_encoding,
-    rima_face_encoding
-]
+# naycem_image = face_recognition.load_image_file("naycem.jpg")
+# naycem_face_encoding = face_recognition.face_encodings(naycem_image)[0]
 
-known_face_names = [
-    "Memory",
-    "Sunny Kid"
-]
+# # Load a second sample picture and learn how to recognize it.
+# rima_image = face_recognition.load_image_file("rima.jpg")
+# rima_face_encoding = face_recognition.face_encodings(rima_image)[0]
+
+# known_face_encodings = [
+#     naycem_face_encoding,
+#     rima_face_encoding
+# ]
+
+# known_face_names = [
+#     "Memory",
+#     "Sunny Kid"
+# ]
 
 @app.route('/recognize', methods=['POST'])
 def upload_file():
@@ -107,12 +134,7 @@ def upload_file():
         
         print(type(rgb_array))
         print(rgb_array.shape)
-        
-        # Save file to the defined folder
-        # file_path = os.path.join(app.config['UPLOAD_FOLDER'], frame.filename)
-        # frame.save(file_path)
-        # return jsonify({"message": f"File {file.filename} uploaded successfully!"}), 200
-
+        print(known_face_names)
 
         face_locations = []
         face_encodings = []
@@ -124,7 +146,7 @@ def upload_file():
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
+            name = ""
 
             # # If a match was found in known_face_encodings, just use the first one.
             # if True in matches:
@@ -139,8 +161,11 @@ def upload_file():
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
-
-        return jsonify({"message": f"{face_names}"}), 200
+        
+        if len(face_names) > 0:
+            return jsonify({"username": f"{face_names[0]}"}), 200
+        
+        return jsonify({"username": ''}), 200
     
     except Exception as e:
         return jsonify({str(e)}), 400
