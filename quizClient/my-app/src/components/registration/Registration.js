@@ -13,7 +13,6 @@ const Signup = () => {
     setUsername(event.target.value);
   };
 
-
   useEffect(() => {
     const getCamera = async () => {
       try {
@@ -74,7 +73,7 @@ const Signup = () => {
             formData.append("username", username);
 
             try {
-            const response = await axios.post(properties.DataServerBasePath+'/'+properties.RecognitionApi, formData, {
+            const response = await axios.post(properties.ServerBasePath+'/'+properties.RegistrationApi, formData, {
                 headers: {
                 "Content-Type": "multipart/form-data",
                 },
