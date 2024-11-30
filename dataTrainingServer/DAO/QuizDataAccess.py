@@ -15,7 +15,7 @@ class QuizDataAccess:
             self._mysql.connection.commit()
             return True
         except Exception as e:
-            print("Error while inserting entity of type QuizModel: " + str(e))
+            print("Error while inserting entity of type QuizModel : " + str(e))
         return False
     
     def insert_query(self, model : QuizModel):
