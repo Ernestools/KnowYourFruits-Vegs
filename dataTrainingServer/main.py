@@ -55,7 +55,13 @@ def memorize_user(username, imageUrl):
     basePath = '..'
     imagePath = basePath + imageUrl
     newImage = face_recognition.load_image_file(imagePath)
-    newFaceEncoding = face_recognition.face_encodings(newImage)[0]
+    faceEncodings = face_recognition.face_encodings(newImage)
+
+    if len(faceEncodings) == 0:
+        print("failed to parse user")
+        return
+    
+    newFaceEncoding = faceEncodings[0]
     known_face_encodings.append(newFaceEncoding)
     known_face_names.append(username)
 
@@ -80,8 +86,10 @@ def start_consumer():
 
     def callback(ch, method, properties, body):
         basePath = './../..'
+        print(body)
         user = json.loads(body)
         if user == None:
+            print("failed to parse user")
             return
         
         imagePath = basePath + user['url']

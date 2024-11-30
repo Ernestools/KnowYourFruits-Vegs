@@ -69,11 +69,11 @@ const Signup = () => {
     canvas.toBlob(async (blob) => {
         if (blob) {
             const formData = new FormData();
-            formData.append("frame", blob, "frame");
+            formData.append("file", blob, "frame.png");
             formData.append("username", username);
 
             try {
-            const response = await axios.post(properties.ServerBasePath+'/'+properties.RegistrationApi, formData, {
+            const response = await axios.post(properties.ServerBasePath+properties.RegistrationApi, formData, {
                 headers: {
                 "Content-Type": "multipart/form-data",
                 },
