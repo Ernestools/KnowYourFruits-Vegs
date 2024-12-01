@@ -70,6 +70,7 @@ def memorize_user(username, imageUrl):
     print("MEMORIZED!!!!!!!")
     print(known_face_names)
 
+
 @app.route("/meet", methods=['POST'])
 def meet_user():
     if(request.json == None):
@@ -77,8 +78,6 @@ def meet_user():
     data = request.json
     memorize_user(data['username'], data['url'])
     return ('', 200)
-
-
 
 
 @app.get("/init/faces")
