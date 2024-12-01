@@ -11,13 +11,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
 public class LoginService {
-    UserRepository userRepository ;
+    private UserRepository userRepository ;
     private RabbitTemplate rabbitTemplate;
+    @Value("${dataServer.meetUserUrl}")
+    private String requestUrl;
+    @Value("${dataServer.baseUrl}")
+    private String dataServerBaseUrl;
 
     @Value("${virtualUsersImagesPath}")
     private String virtualPath;
@@ -42,7 +50,7 @@ public class LoginService {
         publishUser(user);
         return user;
     }
-
+/*
     private void publishUser(UserModel user)
     {
         JSONObject json = new JSONObject();
@@ -50,6 +58,30 @@ public class LoginService {
         json.put("username",user.getUsername());
         json.put("url",user.getUrl());
         rabbitTemplate.convertAndSend("userExchange", "user.created", json.toString());
+    }*/
+
+    private void publishUser(UserModel user) throws IOException {
+        String path = dataServerBaseUrl.concat(requestUrl);
+        URL url = new URL(path.toString());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("username", user.getUsername());
+        jsonObject.put("url", user.getUrl());
+        try(OutputStream os = con.getOutputStream()) {
+            byte[] input = jsonObject.toString().getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+        int status = con.getResponseCode();
+        if(status != 200)
+            throw new IOException(
+                    String.format("Failed to recognize a new user: " +
+                            "remote host responded with %d status", status)
+            );
+        con.disconnect();
     }
 
     private void ensureCorrectPath (){

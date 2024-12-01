@@ -2,12 +2,16 @@ import React, { useRef, useEffect, useState } from "react";
 import { properties } from '../../properties';
 import axios from "axios";
 import './Registration.css'
+import { useNavigate } from "react-router-dom";
+
 
 const Signup = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [username, setUsername] = useState("");
   const [isCaptureReady, setIsCaptureReady] = useState(false);
+  const navigate = useNavigate();
+  
 
   const handleUserInput = (event) => {
     setUsername(event.target.value);
@@ -50,10 +54,9 @@ const Signup = () => {
         const originalWidth = video.videoWidth;
         const originalHeight = video.videoHeight;
 
-        // const width = originalWidth * 0.25;
-        // const height = originalHeight * 0.25;
-        // canvas.width = width;
-        // canvas.height = height;
+        const aspectRatio = originalWidth / originalHeight;
+        canvas.width = 400;
+        canvas.height = canvas.width / aspectRatio;
 
         context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
@@ -64,12 +67,12 @@ const Signup = () => {
 
     if (!canvasRef.current || !isCaptureReady || !username) 
         return;
-
+    
     const canvas = canvasRef.current;
     canvas.toBlob(async (blob) => {
         if (blob) {
             const formData = new FormData();
-            formData.append("file", blob, "frame.png");
+            formData.append("file", blob, "frame.jpg");
             formData.append("username", username);
 
             try {
@@ -79,11 +82,13 @@ const Signup = () => {
                 },
             });
             console.log("Frame sent successfully:", response.data);
+            navigate(`/login`);  
+
             } catch (error) {
             console.error("Error sending frame:", error);
             }
         }
-        }, "image/png");
+        }, "image/jpg", 1);
     }
 
     return (

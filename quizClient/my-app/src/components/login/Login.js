@@ -9,6 +9,8 @@ const Login = () => {
   const [isRecognized, setIsRecognized] = useState(false); 
   const [recognizedName, setRecognizedName] = useState(""); 
   const navigate = useNavigate();
+  const [showAlert, setShowAlert] = useState(false);
+
 
   useEffect(() => {
     const getCamera = async () => {
@@ -82,13 +84,13 @@ const Login = () => {
           } else {
             console.log(`Welcome, ${data.username}!`);
             setRecognizedName(data.username);
-            setIsRecognized(true); 
+            setIsRecognized(true);
+            setShowAlert(true);
             if (videoRef.current && videoRef.current.srcObject) {
               const tracks = videoRef.current.srcObject.getTracks();
               tracks.forEach((track) => track.stop());
               videoRef.current.srcObject = null;
             }
-            navigate(`/quiz?username=${data.username}`);  
           }
         } catch (error) {
           console.error("Error sending frame:", error);
@@ -97,7 +99,11 @@ const Login = () => {
     }, "image/png");
   };
 
-  
+  const handleAlertConfirmation = () => {
+    navigate(`/quiz?username=${recognizedName}`);  
+  }
+
+
   return (
     <div>
       <h1>Face Recognition Login</h1>
@@ -105,6 +111,14 @@ const Login = () => {
         <video ref={videoRef} autoPlay style={{ width: "100%", maxWidth: "500px", border: "1px solid black" }} />
       </div>
       <canvas ref={canvasRef} style={{ display: "none" }} />
+      {showAlert && (
+                <div className="custom-alert">
+                    <div className="alert-content">
+                        <h2>{recognizedName}! Welcome Back</h2>
+                        <button onClick={handleAlertConfirmation}>Start</button>
+                    </div>
+                </div>
+            )}
     </div>
   );
 };

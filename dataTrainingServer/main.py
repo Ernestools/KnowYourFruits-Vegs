@@ -26,6 +26,9 @@ app.config['MYSQL_DB'] = 'curious_kids_quiz'
 test_assets_path = "../static/test"
 model_path = "trained_model.h5"
 
+known_face_encodings = list()
+known_face_names = list()
+
 mysql = MySQL(app)
 predictionService = None
 #PredictionService("trained_model.h5", test_assets_path)
@@ -47,23 +50,36 @@ def initialize_db():
         return ('', 200)
     except Exception as e:
         return (f'Internal Server Error {e}', 500)
-    
-known_face_encodings = []
-known_face_names = []
 
 def memorize_user(username, imageUrl):
+    global known_face_names, known_face_encodings
+    print("@" + hex(id(known_face_names)))
+    print(username+ " "+ imageUrl)
     basePath = '..'
     imagePath = basePath + imageUrl
     newImage = face_recognition.load_image_file(imagePath)
     faceEncodings = face_recognition.face_encodings(newImage)
 
     if len(faceEncodings) == 0:
-        print("failed to parse user")
+        print("failed to identify user")
         return
     
     newFaceEncoding = faceEncodings[0]
     known_face_encodings.append(newFaceEncoding)
     known_face_names.append(username)
+    print("MEMORIZED!!!!!!!")
+    print(known_face_names)
+
+@app.route("/meet", methods=['POST'])
+def meet_user():
+    if(request.json == None):
+        return (f'Bad Request', 400)
+    data = request.json
+    memorize_user(data['username'], data['url'])
+    return ('', 200)
+
+
+
 
 @app.get("/init/faces")
 def load_users():
@@ -77,53 +93,6 @@ def load_users():
     except Exception as e:
         return (f'Internal Server Error {e}', 500)
     
-
-def start_consumer():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-    queueName = "userQueue"
-    channel.queue_declare(queue=queueName, durable=True)
-
-    def callback(ch, method, properties, body):
-        basePath = './../..'
-        print(body)
-        user = json.loads(body)
-        if user == None:
-            print("failed to parse user")
-            return
-        
-        imagePath = basePath + user['url']
-        username = user['username']
-        memorize_user(username=username, imageUrl= imagePath)
-
-
-    channel.basic_consume(queue=queueName, on_message_callback=callback, auto_ack=True)
-    print(" [*] Waiting for messages.")
-    channel.start_consuming()
-
-consumer_thread = threading.Thread(target=start_consumer)
-consumer_thread.daemon = True
-consumer_thread.start()
-
-
-
-
-# naycem_image = face_recognition.load_image_file("naycem.jpg")
-# naycem_face_encoding = face_recognition.face_encodings(naycem_image)[0]
-
-# # Load a second sample picture and learn how to recognize it.
-# rima_image = face_recognition.load_image_file("rima.jpg")
-# rima_face_encoding = face_recognition.face_encodings(rima_image)[0]
-
-# known_face_encodings = [
-#     naycem_face_encoding,
-#     rima_face_encoding
-# ]
-
-# known_face_names = [
-#     "Memory",
-#     "Sunny Kid"
-# ]
 
 @app.route('/recognize', methods=['POST'])
 def upload_file():
